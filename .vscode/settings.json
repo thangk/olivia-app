@@ -1,0 +1,8 @@
+{
+  "window.title": "olivia-app · Main${separator}${activeEditorShort}",
+  "files.exclude": {
+    "**/.gitignore": false,
+    "**/.git": true,
+    ".worktrees": true
+  }
+}
