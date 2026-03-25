@@ -90,39 +90,43 @@ export function useConversations() {
   const deleteConversation = useCallback(
     async (id: string) => {
       const now = Date.now();
+      let convToSave: Conversation | undefined;
       setAllConversations((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, deletedAt: now } : c))
+        prev.map((c) => {
+          if (c.id === id) {
+            const updated = { ...c, deletedAt: now };
+            convToSave = updated;
+            return updated;
+          }
+          return c;
+        })
       );
-      const conv = allConversations.find((c) => c.id === id);
-      if (conv) {
-        await saveConversation({ ...conv, deletedAt: now });
-      }
+      if (convToSave) await saveConversation(convToSave);
       if (activeConversationId === id) {
         setActiveConversationId(null);
         setMessages([]);
         setAssets([]);
       }
     },
-    [activeConversationId, allConversations]
+    [activeConversationId]
   );
 
   // Restore from trash
   const restoreConversation = useCallback(
     async (id: string) => {
+      let convToSave: Conversation | undefined;
       setAllConversations((prev) =>
         prev.map((c) => {
           if (c.id !== id) return c;
           const { deletedAt: _, ...rest } = c;
-          return { ...rest, deletedAt: undefined };
+          const updated = { ...rest, deletedAt: undefined };
+          convToSave = updated;
+          return updated;
         })
       );
-      const conv = allConversations.find((c) => c.id === id);
-      if (conv) {
-        const { deletedAt: _, ...rest } = conv;
-        await saveConversation({ ...rest, deletedAt: undefined });
-      }
+      if (convToSave) await saveConversation(convToSave);
     },
-    [allConversations]
+    []
   );
 
   // Permanent delete — removes from DB
@@ -136,46 +140,49 @@ export function useConversations() {
 
   // Permanently delete all trashed
   const emptyTrash = useCallback(async () => {
-    const trashed = allConversations.filter((c) => !!c.deletedAt);
-    await Promise.all(trashed.map((c) => deleteConvFromDB(c.id)));
-    setAllConversations((prev) => prev.filter((c) => !c.deletedAt));
-  }, [allConversations]);
+    let trashedIds: string[] = [];
+    setAllConversations((prev) => {
+      trashedIds = prev.filter((c) => !!c.deletedAt).map((c) => c.id);
+      return prev.filter((c) => !c.deletedAt);
+    });
+    await Promise.all(trashedIds.map((id) => deleteConvFromDB(id)));
+  }, []);
 
   const updateConversationTitle = useCallback(
     async (id: string, title: string) => {
+      let convToSave: Conversation | undefined;
       setAllConversations((prev) =>
-        prev.map((c) =>
-          c.id === id
-            ? { ...c, title: title.slice(0, 60), updatedAt: Date.now() }
-            : c
-        )
+        prev.map((c) => {
+          if (c.id === id) {
+            const updated = { ...c, title: title.slice(0, 60), updatedAt: Date.now() };
+            convToSave = updated;
+            return updated;
+          }
+          return c;
+        })
       );
-      const conv = allConversations.find((c) => c.id === id);
-      if (conv) {
-        await saveConversation({
-          ...conv,
-          title: title.slice(0, 60),
-          updatedAt: Date.now(),
-        });
-      }
+      if (convToSave) await saveConversation(convToSave);
     },
-    [allConversations]
+    []
   );
 
   // Update per-conversation settings (mode, resolution, aspectRatio)
   const updateConversationSettings = useCallback(
     async (id: string, settings: Partial<Pick<Conversation, "mode" | "resolution" | "aspectRatio">>) => {
+      let convToSave: Conversation | undefined;
       setAllConversations((prev) =>
-        prev.map((c) =>
-          c.id === id ? { ...c, ...settings, updatedAt: Date.now() } : c
-        )
+        prev.map((c) => {
+          if (c.id === id) {
+            const updated = { ...c, ...settings, updatedAt: Date.now() };
+            convToSave = updated;
+            return updated;
+          }
+          return c;
+        })
       );
-      const conv = allConversations.find((c) => c.id === id);
-      if (conv) {
-        await saveConversation({ ...conv, ...settings, updatedAt: Date.now() });
-      }
+      if (convToSave) await saveConversation(convToSave);
     },
-    [allConversations]
+    []
   );
 
   // Prefetch cache — preload messages/assets on hover

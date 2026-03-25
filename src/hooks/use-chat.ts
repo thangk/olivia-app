@@ -11,8 +11,8 @@ interface UseChatOptions {
   mode: GenerationMode;
   addMessage: (msg: ChatMessage) => void;
   updateLastModelMessage: (text: string) => void;
-  onGenerationIntent?: (prompt: string, style?: string) => void;
-  onDirectGenerate?: (prompt: string, image?: { base64: string; mimeType: string }) => void;
+  onGenerationIntent?: (prompt: string, conversationId: string, style?: string) => void;
+  onDirectGenerate?: (prompt: string, image?: { base64: string; mimeType: string }, conversationId?: string) => void;
   onSuggestionsReceived?: (suggestions: string[]) => void;
   onConversationCreated?: (title: string) => Promise<string>;
   updateConversationTitle?: (id: string, title: string) => void;
@@ -82,7 +82,7 @@ export function useChat({
       // Generate mode — skip chat, go straight to image generation
       if (mode === "generate") {
         if (onDirectGenerate) {
-          onDirectGenerate(text, image);
+          onDirectGenerate(text, image, convId);
         }
         return;
       }
@@ -205,7 +205,7 @@ export function useChat({
         if (genMatch && onGenerationIntent) {
           try {
             const gen = JSON.parse(genMatch[1]);
-            onGenerationIntent(gen.prompt, gen.style);
+            onGenerationIntent(gen.prompt, convId, gen.style);
           } catch {
             // Invalid JSON in generation block
           }

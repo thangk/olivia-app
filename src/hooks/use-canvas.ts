@@ -53,8 +53,9 @@ export function useCanvas({
   }, []);
 
   const generateImage = useCallback(
-    async (prompt: string, refImage?: { base64: string; mimeType: string } | null): Promise<GeneratedAsset | null> => {
-      if (!activeConversationId) return null;
+    async (prompt: string, refImage?: { base64: string; mimeType: string } | null, overrideConversationId?: string): Promise<GeneratedAsset | null> => {
+      const effectiveConvId = overrideConversationId || activeConversationId;
+      if (!effectiveConvId) return null;
 
       // Rate limit check
       const rateStatus = canGenerate();
@@ -117,7 +118,7 @@ export function useCanvas({
 
         const asset: GeneratedAsset = {
           id: crypto.randomUUID(),
-          conversationId: activeConversationId,
+          conversationId: effectiveConvId,
           base64: data.imageBase64,
           mimeType: data.imageMimeType || "image/png",
           prompt,

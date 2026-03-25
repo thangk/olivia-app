@@ -162,22 +162,21 @@ export function AppLayout() {
     onConversationCreated: (title) =>
       convos.createConversation(title, "chat", undefined, activeProjectId ?? undefined),
     updateConversationTitle: convos.updateConversationTitle,
-    onDirectGenerate: async (prompt, image) => {
-      // Generate Only mode — send prompt directly to Nano Banana Pro
+    onDirectGenerate: async (prompt, image, conversationId) => {
+      const convId = conversationId || convos.activeConversationId || "";
       const genMsgId = crypto.randomUUID();
       convos.addMessage({
         id: genMsgId,
-        conversationId: convos.activeConversationId || "",
+        conversationId: convId,
         role: "model",
         parts: [{ type: "generating", content: "" }],
         timestamp: Date.now(),
       });
 
-      // Use explicitly attached ref image, or the one from chat input
       const imgRef = image || refImage;
 
       setMobileTab("canvas");
-      const asset = await canvas.generateImage(prompt, imgRef);
+      const asset = await canvas.generateImage(prompt, imgRef, convId);
 
       if (asset) {
         convos.replaceMessage(genMsgId, {
@@ -191,19 +190,19 @@ export function AppLayout() {
         convos.removeMessage(genMsgId);
       }
     },
-    onGenerationIntent: async (prompt) => {
-      // Add a "generating" placeholder message in chat
+    onGenerationIntent: async (prompt, conversationId) => {
+      const convId = conversationId || convos.activeConversationId || "";
       const genMsgId = crypto.randomUUID();
       convos.addMessage({
         id: genMsgId,
-        conversationId: convos.activeConversationId || "",
+        conversationId: convId,
         role: "model",
         parts: [{ type: "generating", content: "" }],
         timestamp: Date.now(),
       });
 
       setMobileTab("canvas");
-      const asset = await canvas.generateImage(prompt, refImage);
+      const asset = await canvas.generateImage(prompt, refImage, convId);
 
       // Replace the generating placeholder with the actual image (or error)
       if (asset) {

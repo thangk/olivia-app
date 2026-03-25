@@ -6,7 +6,7 @@ describe("Suggestions", () => {
   it("renders default suggestions when none provided", () => {
     render(<Suggestions suggestions={[]} onSelect={vi.fn()} />);
     expect(
-      screen.getByText("Lifestyle photo on a marble countertop with morning light")
+      screen.getByText("Product hero shot on clean white, ready for Amazon listing")
     ).toBeDefined();
   });
 
