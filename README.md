@@ -2,30 +2,42 @@
 
 AI-powered product ad generator. Upload a product image, describe your vision, and generate professional ad creatives through conversation.
 
+## Screenshots
+
+| Assisted Mode — Generating an ad | Iterating with brand name |
+|---|---|
+| ![Generate](screenshots/olivia-generate.jpg) | ![Iterate](screenshots/olivia-iterate.jpg) |
+
 ## Features
 
-- **Conversational AI** — Chat with Gemini to describe and refine your ad creatives
-- **AI Image Generation** — Powered by Nano Banana Pro for studio-quality visuals
-- **Iterative Editing** — "Make it warmer", "Add a headline" — refine through conversation
-- **Resolution Control** — Generate in 1K, 2K, or 4K
-- **Aspect Ratios** — 10 options from 1:1 to 21:9 with visual ratio previews
+- **Two Generation Modes** — *Assisted* mode with an AI creative director that asks clarifying questions, or *Generate* mode for direct image generation
+- **AI Image Generation** — Powered by Nano Banana Pro for studio-quality visuals up to 4K
+- **Iterative Editing** — Click "Iterate" on any image to use it as a reference, then describe changes
+- **Resolution & Aspect Ratios** — 1K, 2K, or 4K resolution with 10 aspect ratios from 1:1 to 21:9
+- **Projects & Chats** — Organize work into projects or standalone chats with full conversation history
 - **Agentic Behavior** — Auto-detects product type, suggests ad directions, improves prompts
-- **Multi-Chat** — Create and switch between conversations, all persisted locally
-- **Asset Gallery** — Browse all generated images in a conversation
+- **Asset Gallery** — Browse all generated images with a full-screen lightbox viewer
+- **Trash Bin** — Soft-delete conversations with restore or permanent delete
+- **Search** — Find conversations by title across projects and chats
 - **Dark/Light/System Theme** — No flash on page load
 - **Custom API Key** — Bring your own Gemini API key or use the default
 - **Fully Local** — All data stored in your browser (localStorage + IndexedDB)
+- **URL State** — Refresh the page and stay where you were
+- **Rate Limiting** — Client-side throttling to protect API budget (5/min, 30/hr)
 
 ## Tech Stack
 
-- **Framework:** Next.js (App Router, TypeScript)
-- **UI:** Shadcn UI + Tailwind CSS
-- **Chat AI:** Gemini 3.1 Pro Preview
-- **Image AI:** Nano Banana Pro (`gemini-3-pro-image-preview`)
-- **Theming:** next-themes
-- **Storage:** localStorage + IndexedDB (idb-keyval)
-- **Testing:** Vitest + React Testing Library
-- **Package Manager:** pnpm
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router, TypeScript) |
+| UI | Shadcn UI v4 + Tailwind CSS v4 |
+| Chat AI | Gemini 3.1 Pro Preview |
+| Image AI | Nano Banana Pro (`gemini-3-pro-image-preview`) |
+| Theming | next-themes |
+| Storage | localStorage + IndexedDB (idb-keyval) |
+| Testing | Vitest + React Testing Library |
+| Package Manager | pnpm |
+| Deployment | Vercel |
 
 ## Getting Started
 
@@ -73,29 +85,30 @@ src/
 │   └── page.tsx          # Main workspace page
 ├── components/
 │   ├── ui/               # Shadcn components
-│   ├── layout/           # App layout (sidebar, chat panel, canvas)
-│   ├── chat/             # Chat messages, input, suggestions
-│   ├── canvas/           # Image viewer, gallery, ratio/resolution controls
-│   ├── settings/         # Settings dialog
+│   ├── layout/           # App layout (sidebar, panels, breadcrumbs)
+│   ├── chat/             # Messages, input, suggestions, mode selector
+│   ├── canvas/           # Asset gallery, lightbox, ratio/resolution controls
+│   ├── settings/         # Settings + features dialogs
 │   └── theme/            # Theme provider
-├── hooks/                # Custom React hooks
-├── lib/                  # Utilities (Gemini client, storage, image utils)
+├── hooks/                # Custom React hooks (chat, canvas, conversations, settings)
+├── lib/                  # Utilities (Gemini client, storage, image utils, rate limit)
 └── types/                # TypeScript interfaces
 ```
 
 ## Development
 
 ```bash
-pnpm dev          # Start dev server
+pnpm dev          # Start dev server (Turbopack)
 pnpm build        # Production build
-pnpm test         # Run tests
+pnpm test:run     # Run tests once
+pnpm test         # Run tests in watch mode
 pnpm lint         # Lint code
 ```
 
 ### Git Workflow
 
 ```
-dev → PR → staging (code review) → PR → main (Vercel deploy)
+dev → PR → staging (Devin Review) → PR → main (Vercel deploy)
 ```
 
 ## Deployment
