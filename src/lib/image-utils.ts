@@ -7,8 +7,9 @@ export async function compressImage(
   mimeType: string,
   maxDimension = 1024
 ): Promise<{ base64: string; mimeType: string }> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
+    img.onerror = () => reject(new Error("Failed to load image for compression"));
     img.onload = () => {
       const canvas = document.createElement("canvas");
       let { width, height } = img;
